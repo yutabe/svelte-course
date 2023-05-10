@@ -1,8 +1,8 @@
 <script>
-	import Counter from './lib/Counter.svelte';
+	import Button from './lib/Button.svelte';
 </script>
 
-<Counter />
+<Button size="large" shadow>Button Text</Button>
 
 <style>
 </style>

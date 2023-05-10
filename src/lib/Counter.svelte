@@ -1,14 +1,18 @@
 <script>
-	let count = 0;
-	$: string = `You have clicked ${count} times.`;
+	export let initialCount;
+	export let maxCount = undefined;
+
+	console.log($$props, $$restProps);
+
+	let count = initialCount;
 
 	function increment() {
+		if (count === maxCount) return;
 		count += 1;
 	}
 </script>
 
 <button on:click={increment}>Clicks {count}</button>
-<h3>{string}</h3>
 
 <style>
 	button {
