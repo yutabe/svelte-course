@@ -1,21 +1,42 @@
 <script>
 	export let size = 'small';
 	export let shadow = false;
+	export let bgColor = undefined;
+	export let textColor = undefined;
+
+	console.log($$slots);
 </script>
 
-<button class:size-lg={size === 'large'} class:size-sm={size === 'small'} class:shadow
-	><slot>FallBack</slot></button
+<button
+	style:--buttonBgColor={bgColor}
+	style:--buttonTextColor={textColor}
+	class:size-lg={size === 'large'}
+	class:size-sm={size === 'small'}
+	class:has-left={$$slots.leftContent}
+	class:shadow
 >
+	{#if $$slots.leftContent}
+		<div class="left-content">
+			<slot name="leftContent" />
+		</div>
+	{/if}
+	<slot>FallBack</slot>
+</button>
 
 <style lang="scss">
 	button {
+		display: flex;
+		align-items: center;
 		border: none;
-		background-color: #ff3e00;
-		color: #ffffff;
+		background-color: var(--buttonBgColor);
+		color: var(--buttonTextColor);
 		padding: 15px 20px;
 		font-weight: bold;
 		border-radius: 5px;
 		cursor: pointer;
+		.left-content {
+			margin-right: 10px;
+		}
 		&:hover {
 			background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0 0);
 		}
