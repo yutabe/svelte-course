@@ -4,23 +4,34 @@
 	export let bgColor = undefined;
 	export let textColor = undefined;
 
-	console.log($$slots);
+
+	let isLeftHovered;
 </script>
 
 <button
+	on:click
 	style:--buttonBgColor={bgColor}
 	style:--buttonTextColor={textColor}
 	class:size-lg={size === 'large'}
 	class:size-sm={size === 'small'}
 	class:has-left={$$slots.leftContent}
 	class:shadow
+	{...$$restProps}
 >
 	{#if $$slots.leftContent}
-		<div class="left-content">
+		<div
+			class="left-content"
+			on:mouseenter={() => {
+				isLeftHovered = true;
+			}}
+			on:mouseleave={() => {
+				isLeftHovered = false;
+			}}
+		>
 			<slot name="leftContent" />
 		</div>
 	{/if}
-	<slot>FallBack</slot>
+	<slot {isLeftHovered}>FallBack</slot>
 </button>
 
 <style lang="scss">
@@ -36,6 +47,10 @@
 		cursor: pointer;
 		.left-content {
 			margin-right: 10px;
+		}
+		&:disabled {
+			opacity: 0.8;
+			cursor: not-allowed;
 		}
 		&:hover {
 			background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0 0);
