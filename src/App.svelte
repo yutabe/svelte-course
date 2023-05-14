@@ -22,6 +22,8 @@
 		}
 	];
 
+	$: console.log(todos);
+
 	function handleAddTodo(event) {
 		event.preventDefault();
 		setTimeout(() => {
@@ -34,7 +36,7 @@
 				}
 			];
 			todoList.clearInput();
-		}, 2300);
+		}, 500);
 	}
 
 	function handleRemoveTodo(event) {
