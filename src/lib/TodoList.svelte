@@ -2,20 +2,32 @@
 
 <script>
 	import Button from './Button.svelte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, afterUpdate } from 'svelte';
+	import FaRegTrashAlt from 'svelte-icons/fa/FaRegTrashAlt.svelte';
 
+	afterUpdate(() => {
+		if (autoscroll) listDiv.scrollTo(0, listDivScrollHeight);
+		autoscroll = false;
+	});
 	export let todos = [];
-	export const readonly = 'read only';
+	let prevTodos = todos;
+	let inputText = '';
+	let input, listDiv, autoscroll, listDivScrollHeight;
+
+	const dispatch = createEventDispatcher();
+
+	$: {
+		autoscroll = todos.length > prevTodos.length;
+		console.log(prevTodos, todos);
+		prevTodos = todos;
+	}
+
 	export function clearInput() {
 		inputText = '';
 	}
 	export function focusInput() {
 		input.focus();
 	}
-	let inputText = '';
-	let input;
-
-	const dispatch = createEventDispatcher();
 
 	function handleAddTodo() {
 		const isNotCancelled = dispatch(
@@ -45,27 +57,76 @@
 </script>
 
 <div class="todo-list-wrapper">
-	<ul>
-		{#each todos as { id, title, completed } (id)}
-			{@debug id, title, completed}
-			<li>
-				<label>
-					<input
-						on:input={(event) => {
-							event.currentTarget.checked = completed;
-							handleToggleTodo(id, !completed);
-						}}
-						type="checkbox"
-						checked={completed}
-					/>
-					{title}
-				</label>
-				<button on:click={() => handleRemoveTodo(id)}>Remove</button>
-			</li>
-		{/each}
-	</ul>
+	<div class="todo-list" bind:this={listDiv}>
+		<div bind:offsetHeight={listDivScrollHeight}>
+			{#if todos.length === 0}
+				<p class="no-items-text">No todos yet</p>
+			{:else}
+				<ul>
+					{#each todos as { id, title, completed } (id)}
+						<li class:completed>
+							<label>
+								<input
+									on:input={(event) => {
+										event.currentTarget.checked = completed;
+										handleToggleTodo(id, !completed);
+									}}
+									type="checkbox"
+									checked={completed}
+								/>
+								{title}
+							</label>
+							<button
+								class="remove-todo-button"
+								aria-label="Remove todo: {title}"
+								on:click={() => handleRemoveTodo(id)}
+							>
+								<span style:width="10px" style:display="inline-block">
+									<FaRegTrashAlt />
+								</span>
+							</button>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
+	</div>
 	<form class="add-to-form" on:submit|preventDefault={handleAddTodo}>
-		<input bind:this={input} bind:value={inputText} />
+		<input bind:this={input} bind:value={inputText} placeholder="New Todo" />
 		<Button type="submit" disabled={!inputText}>Add</Button>
 	</form>
 </div>
+
+<style lang="scss">
+	.todo-list-wrapper {
+		background-color: #424242;
+		border: 1px solid #4b4b4b;
+		.no-items-text {
+			margin: 0;
+			padding: 15px;
+			text-align: center;
+		}
+	}
+	.todo-list {
+		max-height: 200px;
+		overflow: auto;
+		ul {
+			margin: 0;
+			padding: 10px;
+			list-style: none;
+			li {
+				margin-bottom: 5px;
+				display: flex;
+				align-items: center;
+				background-color: #303030;
+				border-radius: 5px;
+				padding: 10px;
+				position: relative;
+				label {
+					cursor: pointer;
+					font-size: 18px;
+				}
+			}
+		}
+	}
+</style>
